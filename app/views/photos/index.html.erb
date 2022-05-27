@@ -1,0 +1,17 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Photos</h1>
+
+<div id="photos">
+  <% @photos.each do |photo| %>
+    <%= render photo %>
+    <p>
+    	<section>
+			    <img src="<%= photo.signed_url%>" width="200px" height="200px" oncontextmenu="return false;">
+			</section>
+      <%= link_to photo.title, photo %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New photo", new_photo_path %>

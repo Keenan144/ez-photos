@@ -1,0 +1,12 @@
+<h1>New photo</h1>
+
+<h1>Upload a file</h1>
+
+<%= form_tag photos_path, enctype: 'multipart/form-data' do %>
+	<%= file_field_tag :file  %>
+	<%= submit_tag 'Upload file' %>
+<% end %>
+
+<div>
+  <%= link_to "Back to photos", photos_path %>
+</div>
