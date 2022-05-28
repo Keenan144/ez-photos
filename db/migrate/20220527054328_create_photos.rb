@@ -6,6 +6,7 @@ class CreatePhotos < ActiveRecord::Migration[7.0]
     	t.string :bucket
     	t.string :key
     	t.datetime :expires_at
+      t.integer :user_id
 
       t.timestamps
     end

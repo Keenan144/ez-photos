@@ -5,9 +5,9 @@ class PhotosController < ApplicationController
   # GET /photos or /photos.json
   def index
     signer = Aws::S3::Presigner.new
-    @photos = Photo.all
+    @photos = Photo.where({user_id: current_user.id})
     @photos.each do |photo|
-      if photo.expires_at.past?
+      if !photo.signed_url || photo.expires_at.past?
         url, headers = signer.presigned_request(
           :get_object, bucket: ENV['S3_BUCKET'], key: photo.key, expires_in: 604800
         )
@@ -28,8 +28,6 @@ class PhotosController < ApplicationController
   # GET /photos/new
   def new
     @photo = Photo.new
-    p current_user
-    p user_session
   end
 
   # GET /photos/1/edit
@@ -39,29 +37,30 @@ class PhotosController < ApplicationController
   # POST /photos or /photos.json
   def create
     key = 'dev/users/' + current_user.id.to_s + '/upload/' + params[:file].original_filename
+
     obj = S3_Client.put_object(bucket: ENV['S3_BUCKET'], body: params[:file], key: key)
 
-    resp = S3_Client.get_object({bucket: ENV['S3_BUCKET'], key: key})
+    # resp = S3_Client.get_object({bucket: ENV['S3_BUCKET'], key: key})
 
-    if resp.etag
-      signer = Aws::S3::Presigner.new
-      url, headers = signer.presigned_request(
-        :get_object, bucket: ENV['S3_BUCKET'], key: key, expires_in: 604800
-      )
+    # if resp.etag
+      # signer = Aws::S3::Presigner.new
+      # url, headers = signer.presigned_request(
+      #   :get_object, bucket: ENV['S3_BUCKET'], key: key, expires_in: 604800
+      # )
 
       @upload = Photo.create(
-        title: params[:file].original_filename,
-        key: key,
         bucket: ENV['S3_BUCKET'],
-        signed_url: url,
-        expires_at: DateTime.now + 7.days
+        expires_at: DateTime.now + 7.days,
+        key: key,
+        # signed_url: url,
+        title: params[:file].original_filename,
+        user_id: current_user.id
       )
 
-
       redirect_to photos_path, notice: "Photo was successfully updated."
-    else
-      return false
-    end
+    # else
+      # return false
+    # end
     rescue StandardError => e
         puts "Error uploading object: #{e.message}"
   end
@@ -98,7 +97,7 @@ class PhotosController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_photo
       @photo = Photo.find(params[:id])
-      if @photo.expires_at.past?
+      if !@photo.signed_url || @photo.expires_at.past?
         url, headers = signer.presigned_request(
           :get_object, bucket: ENV['S3_BUCKET'], key: photo.key, expires_in: 604800
         )
