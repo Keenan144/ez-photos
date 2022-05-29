@@ -1,14 +1,24 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Accounts</h1>
 
-<div id="accounts">
-  <% @accounts.each do |account| %>
-    <%= render account %>
-    <p>
-      <%= link_to "Show this account", account %>
-    </p>
-  <% end %>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-8 col-lg-6">
+      <!-- Section Heading-->
+      <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+        <h3>Our Creative <span> Team</span></h3>
+        <p>Appland is completely creative, lightweight, clean &amp; super responsive app landing page.</p>
+        <div class="line"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" id="accounts">
+	  <% @accounts.each do |account| %>
+	    <%= render :partial => "account_preview", :collection => @accounts, :as => :account %>
+	  <% end %>
+	</div>
 </div>
 
 <%= link_to "New account", new_account_path %>
