@@ -6,5 +6,7 @@
   <%= link_to "Edit this account", edit_account_path(@account) %> |
   <%= link_to "Back to accounts", accounts_path %>
 
-  <%= button_to "Destroy this account", @account, method: :delete %>
+  <% if current_user.account.account_type === "admin" %>
+  	<%= button_to "Destroy this account", @account, method: :delete %>
+	<% end %>
 </div>

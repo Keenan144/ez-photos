@@ -1,14 +1,17 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+
   before_action :set_account, only: %i[ show edit update destroy ]
 
   # GET /accounts or /accounts.json
   def index
+    puts "hello brent"
     @accounts = Account.all
   end
 
   # GET /accounts/1 or /accounts/1.json
   def show
+    p @account
   end
 
   # GET /accounts/new

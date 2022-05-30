@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_29_070756) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_30_053027) do
   create_table "accounts", force: :cascade do |t|
     t.integer "user_id"
     t.string "first_name"
@@ -28,6 +28,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_29_070756) do
     t.string "tiktok"
     t.string "profile_pic_url"
     t.integer "account_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "admins", force: :cascade do |t|
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

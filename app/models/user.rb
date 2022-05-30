@@ -7,6 +7,7 @@ class User < ApplicationRecord
   validates :email, format: URI::MailTo::EMAIL_REGEXP
 
   has_one :account
+  has_one :admin
   
   # the authenticate method from devise documentation
   def self.authenticate(email, password)
