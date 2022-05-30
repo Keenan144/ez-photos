@@ -9,7 +9,7 @@
 
                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Log In</p>
 
-                <%= form_for(resource, as: resource_name, :class => 'mx-1 mx-md-4', url: registration_path(resource_name)) do |f| %>
+                <%= form_for(resource, as: resource_name, :class => 'mx-1 mx-md-4', url: user_session_path) do |f| %>
                   <%= render "users/shared/error_messages", resource: resource %>
 
                   <div class="d-flex flex-row align-items-center mb-4">

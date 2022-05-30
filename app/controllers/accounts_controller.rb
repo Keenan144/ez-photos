@@ -1,11 +1,10 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
 
-  before_action :set_account, only: %i[ show edit update destroy ]
+  before_action :set_account, only: %i[ show edit update update_profile_picture destroy ]
 
   # GET /accounts or /accounts.json
   def index
-    puts "hello brent"
     @accounts = Account.all
   end
 
@@ -21,6 +20,30 @@ class AccountsController < ApplicationController
 
   # GET /accounts/1/edit
   def edit
+  end
+
+  def update_profile_picture
+    key = 'dev/users/' + current_user.id.to_s + '/profile/' + params[:file].original_filename
+
+    obj = S3_Client.put_object(bucket: ENV['S3_BUCKET'], body: params[:file], key: key)
+
+    signer = Aws::S3::Presigner.new
+      url, headers = signer.presigned_request(
+        :get_object, bucket: ENV['S3_BUCKET'], key: key, expires_in: 604800
+      )
+
+    @upload = Photo.create(
+      bucket: ENV['S3_BUCKET'],
+      expires_at: DateTime.now + 7.days,
+      key: key,
+      signed_url: url,
+      title: params[:file].original_filename,
+      user_id: current_user.id
+    )
+
+    p @upload
+
+    @account.update(profile_pic_url: url)
   end
 
   # POST /accounts or /accounts.json

@@ -1,10 +1,12 @@
 class PhotosController < ApplicationController
   before_action :authenticate_user!
+  before_action :check_permissions
   before_action :set_photo, only: %i[ show edit update destroy ]
 
   # GET /photos or /photos.json
   def index
     signer = Aws::S3::Presigner.new
+    p current_user
     @photos = Photo.where({user_id: current_user.id})
     @photos.each do |photo|
       if !photo.signed_url || photo.expires_at.past?
@@ -27,7 +29,7 @@ class PhotosController < ApplicationController
 
   # GET /photos/new
   def new
-    @photo = Photo.new
+      @photo = Photo.new
   end
 
   # GET /photos/1/edit
@@ -43,10 +45,10 @@ class PhotosController < ApplicationController
     # resp = S3_Client.get_object({bucket: ENV['S3_BUCKET'], key: key})
 
     # if resp.etag
-      # signer = Aws::S3::Presigner.new
-      # url, headers = signer.presigned_request(
-      #   :get_object, bucket: ENV['S3_BUCKET'], key: key, expires_in: 604800
-      # )
+      signer = Aws::S3::Presigner.new
+      url, headers = signer.presigned_request(
+        :get_object, bucket: ENV['S3_BUCKET'], key: key, expires_in: 604800
+      )
 
       @upload = Photo.create(
         bucket: ENV['S3_BUCKET'],
@@ -107,6 +109,12 @@ class PhotosController < ApplicationController
           signed_url: url,
           expires_at: d + 7.days
         )
+      end
+    end
+
+    def check_permissions
+      if current_user.account.account_type === 'customer'
+        redirect_to root_path
       end
     end
 
