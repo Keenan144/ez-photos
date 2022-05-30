@@ -1,4 +1,5 @@
 class AccountsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_account, only: %i[ show edit update destroy ]
 
   # GET /accounts or /accounts.json
@@ -22,6 +23,7 @@ class AccountsController < ApplicationController
   # POST /accounts or /accounts.json
   def create
     @account = Account.new(account_params)
+    @account.user_id = current_user.id
 
     respond_to do |format|
       if @account.save
@@ -60,11 +62,28 @@ class AccountsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_account
-      @account = Account.find(current_user.account.id)
+      if current_user.account
+        @account = Account.find(current_user.account.id)
+      else 
+        redirect_to new_account_path
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def account_params
-      params.fetch(:account, {})
+      params.fetch(:account, {}).permit(:first_name,
+       :last_name,
+       :phone,
+       :mobile,
+       :street_address,
+       :city,
+       :state,
+       :zip,
+       :facebook,
+       :twitter,
+       :website,
+       :instagram,
+       :tiktok
+     )
     end
 end
